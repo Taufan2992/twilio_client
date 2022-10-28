@@ -1,23 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react';
+import { useMutation } from 'react-query';
+import { API } from './config/api';
 
 function App() {
+
+const [forms, setForms] = useState({
+  roomName : ""
+})
+
+const handleChange = (e) => {
+  setForms({
+    ...forms,
+    [e.target.name]: e.target.value,
+  });
+};
+
+console.log(forms);
+
+const handleSubmit = useMutation(async (e) => {
+  try {
+    e.preventDefault();
+
+    const config = {
+      headers: {
+        accept : "aplication/json",
+        "Content-type": "application/json",
+      },
+    };
+
+    // Store data with FormData as object
+    const body = JSON.stringify({ roomName : forms})
+    console.log("Room Name : ",forms);
+    // Insert data
+    const response = await API.post("/join-room", body, config);
+    console.log('====================================');
+    console.log(response);
+    console.log('====================================');
+  } catch (error) {
+    console.log(error);
+  }
+});
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <form  id="room-name-form" onSubmit={(e) => handleSubmit.mutate(e)}>
+      Enter a Room Name to join: <input name="roomName" id="room-name-input" onChange={handleChange}/>
+      <button type="submit">Join Room</button>
+      </form>
+      <div id="video-container"></div>
+
     </div>
   );
 }
